@@ -61,10 +61,20 @@ For further information, please see Chapter 3 of the NLTK book.
 
 import functools
 import re
+from typing import List, Tuple
 
 from nltk.data import load
 from nltk.tokenize.casual import TweetTokenizer, casual_tokenize
 from nltk.tokenize.destructive import NLTKWordTokenizer
+
+# Hindi tokenizers
+from nltk.tokenize.hindi import (
+    HindiCharacterTokenizer,
+    HindiNGramTokenizer,
+    HindiSentenceTokenizer,
+    HindiSubwordTokenizer,
+    HindiWordTokenizer,
+)
 from nltk.tokenize.legality_principle import LegalitySyllableTokenizer
 from nltk.tokenize.mwe import MWETokenizer
 from nltk.tokenize.punkt import PunktSentenceTokenizer, PunktTokenizer
@@ -143,3 +153,93 @@ def word_tokenize(text, language="english", preserve_line=False):
     return [
         token for sent in sentences for token in _treebank_word_tokenizer.tokenize(sent)
     ]
+
+
+# Hindi tokenization convenience functions
+_hindi_word_tokenizer = HindiWordTokenizer()
+_hindi_sentence_tokenizer = HindiSentenceTokenizer()
+_hindi_character_tokenizer = HindiCharacterTokenizer()
+
+
+def hindi_word_tokenize(text: str, language: str = "hindi") -> List[str]:
+    """
+    Tokenize Hindi text into words.
+
+    :param text: Input Hindi text in Devanagari script
+    :type text: str
+    :param language: Language identifier (default: 'hindi')
+    :type language: str
+    :return: List of word tokens
+    :rtype: List[str]
+
+    Example:
+
+        >>> from nltk.tokenize import hindi_word_tokenize
+        >>> text = "राम और सीता वन में गए।"
+        >>> hindi_word_tokenize(text)
+        ['राम', 'और', 'सीता', 'वन', 'में', 'गए', '।']
+    """
+    return _hindi_word_tokenizer.tokenize(text)
+
+
+def hindi_sent_tokenize(text: str, language: str = "hindi") -> List[str]:
+    """
+    Tokenize Hindi text into sentences.
+
+    :param text: Input Hindi text in Devanagari script
+    :type text: str
+    :param language: Language identifier (default: 'hindi')
+    :type language: str
+    :return: List of sentence strings
+    :rtype: List[str]
+
+    Example:
+
+        >>> from nltk.tokenize import hindi_sent_tokenize
+        >>> text = "राम वन गया। सीता घर रही।"
+        >>> hindi_sent_tokenize(text)
+        ['राम वन गया।', 'सीता घर रही।']
+    """
+    return _hindi_sentence_tokenizer.tokenize(text)
+
+
+def hindi_char_tokenize(text: str) -> List[str]:
+    """
+    Character-level tokenization for Hindi text.
+
+    Handles Unicode Devanagari character boundaries, keeping vowel signs
+    (matras) with their base consonants and preserving conjunct consonants.
+
+    :param text: Input Hindi text
+    :type text: str
+    :return: List of character tokens
+    :rtype: List[str]
+
+    Example:
+
+        >>> from nltk.tokenize import hindi_char_tokenize
+        >>> hindi_char_tokenize("राम")
+        ['रा', 'म']
+    """
+    return _hindi_character_tokenizer.tokenize(text)
+
+
+def hindi_ngrams(text: str, n: int = 2) -> List[Tuple[str, ...]]:
+    """
+    Generate n-grams from Hindi text.
+
+    :param text: Input Hindi text
+    :type text: str
+    :param n: Size of n-grams (default: 2 for bigrams)
+    :type n: int
+    :return: List of n-gram tuples
+    :rtype: List[Tuple[str, ...]]
+
+    Example:
+
+        >>> from nltk.tokenize import hindi_ngrams
+        >>> hindi_ngrams("राम और सीता", n=2)
+        [('राम', 'और'), ('और', 'सीता')]
+    """
+    tokenizer = HindiNGramTokenizer(n=n)
+    return tokenizer.tokenize(text)
